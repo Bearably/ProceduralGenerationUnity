@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class Generator : MonoBehaviour
 {
-    public float radius = 1;
-    public Vector2 regionSize = Vector2.one;
-    public int rejectionSamples = 30;
-    public float displayRadius = 1;
+    [SerializeField] public float radius = 0.8f;
+    [SerializeField] public Vector2 regionSize = new Vector2(8, 10);
+    [SerializeField] public int rejectionSamples = 30;
+    [SerializeField] public float displayRadius = 0.03f;
 
-    List<Vector2> points;
+    public static List<Vector2> points;
 
     void checkRadius()
     {

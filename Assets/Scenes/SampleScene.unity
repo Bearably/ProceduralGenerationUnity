@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 13444651}
   - component: {fileID: 13444650}
+  - component: {fileID: 13444652}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -152,10 +153,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a419217660d9bb4c93ed3f1a0d19b80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 0.72
-  regionSize: {x: 8.49, y: 6.66}
+  radius: 0.27
+  regionSize: {x: 9.68, y: 9.89}
   rejectionSamples: 30
-  displayRadius: 0.08
+  displayRadius: 0.03
 --- !u!4 &13444651
 Transform:
   m_ObjectHideFlags: 0
@@ -169,4 +170,114 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &13444652
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 13444649}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98235f32e3caa474b9a13e696e4cebd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  drawTrianglePoints: 1
+  drawTriangleEdges: 1
+  drawVoronoiPoints: 1
+  drawVoronoiEdges: 1
+  drawHull: 1
+  createMesh: 1
+  voronoiEdgeWidth: 0.01
+  triangleEdgeWidth: 0.05
+  meshMaterial: {fileID: 2100000, guid: c861c47d3a8a4064ea3bd434520ea6cc, type: 2}
+  lineMaterial: {fileID: 2100000, guid: 1dc6695b65880b941b9341c3a2de4da8, type: 2}
+  triangleEdgeColor: {r: 0, g: 0, b: 0, a: 1}
+  hullColor: {r: 1, g: 0, b: 1, a: 1}
+  voronoiColor: {r: 1, g: 1, b: 1, a: 1}
+  trianglePointPrefab: {fileID: 5961768956659207801, guid: b713f930e7609a7439d911fd1e79ef6a, type: 3}
+  voronoiPointPrefab: {fileID: 5961768956659207801, guid: 7a819736853b1bb4abd2da80236ada00, type: 3}
+--- !u!1 &23771971
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 23771974}
+  - component: {fileID: 23771973}
+  - component: {fileID: 23771972}
+  m_Layer: 0
+  m_Name: Camera
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!81 &23771972
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 23771971}
+  m_Enabled: 1
+--- !u!20 &23771973
+Camera:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 23771971}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0.25111246, g: 0.36257708, b: 0.5377358, a: 0}
+  m_projectionMatrixMode: 1
+  m_GateFitMode: 2
+  m_FOVAxisMode: 0
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_FocalLength: 50
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.3
+  far clip plane: 1000
+  field of view: 60
+  orthographic: 0
+  orthographic size: 5
+  m_Depth: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 0
+  m_TargetEye: 3
+  m_HDR: 1
+  m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
+--- !u!4 &23771974
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 23771971}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.2415032, y: 2.9569116, z: -19.5538}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
