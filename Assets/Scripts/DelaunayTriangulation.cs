@@ -49,7 +49,10 @@ public class DelaunayTriangulation : MonoBehaviour
 
     private void Triangulate()
     {
+        if (points.Count < 3) return;
+
         delaunator = new Delaunator(points.ToArray());
+        CreateMesh();
         CreateTriangle();
     }
 
@@ -86,5 +89,32 @@ public class DelaunayTriangulation : MonoBehaviour
         lineRenderer.startWidth = width;
         lineRenderer.endWidth = width;
         lineRenderer.sortingOrder = order;
+    }
+
+    private void CreateMesh()
+    {
+        if (!createMesh) return;
+
+        if (meshObject != null)
+        {
+            Destroy(meshObject);
+        }
+
+        var mesh = new Mesh
+        {
+            vertices = delaunator.Points.ToVectors3(),
+            triangles = delaunator.Triangles
+        };
+
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+
+
+        meshObject = new GameObject("TriangleMesh");
+        var meshRenderer = meshObject.AddComponent<MeshRenderer>();
+        meshRenderer.GetComponent<Renderer>().material = meshMaterial;
+        var meshFilter = meshObject.AddComponent<MeshFilter>();
+        meshFilter.mesh = mesh;
+
     }
 }

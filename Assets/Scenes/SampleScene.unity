@@ -154,7 +154,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radius: 0.27
-  regionSize: {x: 9.68, y: 9.89}
+  regionSize: {x: 10, y: 10}
   rejectionSamples: 30
   displayRadius: 0.03
 --- !u!4 &13444651
@@ -190,8 +190,8 @@ MonoBehaviour:
   drawHull: 1
   createMesh: 1
   voronoiEdgeWidth: 0.01
-  triangleEdgeWidth: 0.05
-  meshMaterial: {fileID: 2100000, guid: c861c47d3a8a4064ea3bd434520ea6cc, type: 2}
+  triangleEdgeWidth: 0.01
+  meshMaterial: {fileID: 2100000, guid: 57cc1e138a82b0040afb7ffd144568b5, type: 2}
   lineMaterial: {fileID: 2100000, guid: 1dc6695b65880b941b9341c3a2de4da8, type: 2}
   triangleEdgeColor: {r: 0, g: 0, b: 0, a: 1}
   hullColor: {r: 1, g: 0, b: 1, a: 1}
@@ -234,7 +234,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.25111246, g: 0.36257708, b: 0.5377358, a: 0}
+  m_BackGroundColor: {r: 1, g: 1, b: 1, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
