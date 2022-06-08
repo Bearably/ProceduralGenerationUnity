@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,6 +12,19 @@ public class Generator : MonoBehaviour
 
     public static List<Vector2> points;
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Backspace))
+        {
+            GenerateNewPoints();
+        }
+    }
+
+    private void GenerateNewPoints()
+    {
+        points = PoissonDiscSampling.GeneratePoints(radius, regionSize, rejectionSamples);
+    }
+
     void checkRadius()
     {
         if (radius < 0.1) radius = Mathf.Max(radius, 0.1f);
@@ -19,7 +33,7 @@ public class Generator : MonoBehaviour
     void OnValidate()
     {
         checkRadius();
-        points = PoissonDiscSampling.GeneratePoints(radius, regionSize, rejectionSamples);
+        GenerateNewPoints();
     }
 
     void OnDrawGizmos()

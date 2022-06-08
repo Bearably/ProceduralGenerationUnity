@@ -12,6 +12,10 @@ public class DelaunayTriangulation : MonoBehaviour
     private List<IPoint> points = new List<IPoint>();
     private GameObject meshObject;
 
+    private float radius;
+    private int numSamplesBeforeRejection;
+    private Vector2 regionSize;
+
     [SerializeField] bool drawTrianglePoints = true;
     [SerializeField] bool drawTriangleEdges = true;
     [SerializeField] bool drawVoronoiPoints = true;
@@ -37,6 +41,11 @@ public class DelaunayTriangulation : MonoBehaviour
 
     private Transform PointsContainer;
 
+    private void Start()
+    {
+        Clear();
+    }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Return))
@@ -45,6 +54,44 @@ public class DelaunayTriangulation : MonoBehaviour
             Debug.Log($"Generated Points Count {points.Count}");
             Triangulate();
         }
+
+        if (Input.GetKeyDown(KeyCode.Backspace))
+        {
+            Clear();
+        }
+    }
+
+    private void Clear()
+    {
+        CreateNewPoints();
+        CreateNewTrianglesContainer();
+
+        if (meshObject != null)
+        {
+            Destroy(meshObject);
+        }
+
+        delaunator = null;
+    }
+
+    private void CreateNewPoints()
+    {
+        if (PointsContainer != null)
+        {
+            Destroy(PointsContainer.gameObject);
+        }
+
+        PointsContainer = new GameObject(nameof(PointsContainer)).transform;
+    }
+
+    private void CreateNewTrianglesContainer()
+    {
+        if (TrianglesContainer != null)
+        {
+            Destroy(TrianglesContainer.gameObject);
+        }
+
+        TrianglesContainer = new GameObject(nameof(TrianglesContainer)).transform;
     }
 
     private void Triangulate()
@@ -52,8 +99,8 @@ public class DelaunayTriangulation : MonoBehaviour
         if (points.Count < 3) return;
 
         delaunator = new Delaunator(points.ToArray());
-        CreateMesh();
         CreateTriangle();
+        CreateMesh();
     }
 
     private void CreateTriangle()
@@ -70,7 +117,7 @@ public class DelaunayTriangulation : MonoBehaviour
             if (drawTrianglePoints)
             {
                 var pointGameObject = Instantiate(trianglePointPrefab, PointsContainer);
-                pointGameObject.transform.SetPositionAndRotation(edge.P.ToVector3(), Quaternion.identity);  
+                pointGameObject.transform.SetPositionAndRotation(edge.P.ToVector3(), Quaternion.identity);
             }
         });
     }
@@ -109,12 +156,10 @@ public class DelaunayTriangulation : MonoBehaviour
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
 
-
         meshObject = new GameObject("TriangleMesh");
         var meshRenderer = meshObject.AddComponent<MeshRenderer>();
         meshRenderer.GetComponent<Renderer>().material = meshMaterial;
         var meshFilter = meshObject.AddComponent<MeshFilter>();
         meshFilter.mesh = mesh;
-
     }
 }
