@@ -6,11 +6,32 @@ public static class PoissonDiscSampling
 {
     public static List<Vector2> GeneratePoints(float radius, Vector2 sampleRegionSize, int numSamplesBeforeRejection = 30)
     {
+
         float cellSize = radius / Mathf.Sqrt(2);
         int[,] grid = new int[Mathf.CeilToInt(sampleRegionSize.x / cellSize), Mathf.CeilToInt(sampleRegionSize.y / cellSize)];
         List<Vector2> points = new List<Vector2>();
         List<Vector2> spawnPoints = new List<Vector2>();
-
+        Vector2 borderPoint1 = new Vector2(0, 0);
+        Vector2 borderPoint2 = new Vector2(0, sampleRegionSize.y);
+        Vector2 borderPoint3 = new Vector2(sampleRegionSize.x, 0);
+        Vector2 borderPoint4 = new Vector2(sampleRegionSize.x, sampleRegionSize.y);
+        for (int borderCount = 0; borderCount < (sampleRegionSize.x * sampleRegionSize.y); borderCount += 10)
+        {
+            int count = 0;
+            Vector2 alongBorderPoint1 = new Vector2(sampleRegionSize.x, sampleRegionSize.y / count);
+            points.Add(alongBorderPoint1);
+            Vector2 alongBorderPoint2 = new Vector2(sampleRegionSize.x / count, sampleRegionSize.y);
+            points.Add(alongBorderPoint2);
+            Vector2 alongBorderPoint3 = new Vector2(0, sampleRegionSize.y / count);
+            points.Add(alongBorderPoint3);
+            Vector2 alongBorderPoint4 = new Vector2(sampleRegionSize.x / count, 0);
+            points.Add(alongBorderPoint4);
+            count++;
+        }
+        points.Add(borderPoint1);
+        points.Add(borderPoint2);
+        points.Add(borderPoint3);
+        points.Add(borderPoint4);
         spawnPoints.Add(sampleRegionSize / 2);
         while (spawnPoints.Count > 0)
         {

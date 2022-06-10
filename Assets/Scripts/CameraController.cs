@@ -6,11 +6,11 @@ public class CameraController : MonoBehaviour
 {
     private float minFov = 5f;
     private float maxFov = 90f;
-    private Vector3 camOrigin;
     public float sensitivity = 10f;
-    public float moveSpeed = 1f;
+    public float moveSpeed = 10f;
     public Camera cam;
- 
+    private Vector3 dragOrigin;
+
     void Update()
     {
         Zoom();
@@ -27,17 +27,21 @@ public class CameraController : MonoBehaviour
 
     void Move()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetKey(KeyCode.W))
         {
-            camOrigin = Input.mousePosition;
-            return;
+            cam.transform.position = new Vector3(cam.transform.position.x, cam.transform.position.y + (0.01f * moveSpeed), cam.transform.position.z);
         }
-
-        if (!Input.GetMouseButton(0)) return;
-
-        Vector3 pos = cam.ScreenToViewportPoint(Input.mousePosition - camOrigin);
-        Vector3 move = new Vector3(-(pos.x) * moveSpeed, -(pos.y) * moveSpeed, 0);
-
-        transform.Translate(move, Space.World);
+        if (Input.GetKey(KeyCode.S))
+        {
+            cam.transform.position = new Vector3(cam.transform.position.x, cam.transform.position.y - (0.01f * moveSpeed), cam.transform.position.z);
+        }
+        if (Input.GetKey(KeyCode.A))
+        {
+            cam.transform.position = new Vector3(cam.transform.position.x - (0.01f * moveSpeed), cam.transform.position.y, cam.transform.position.z);
+        }
+        if (Input.GetKey(KeyCode.D))
+        {
+            cam.transform.position = new Vector3(cam.transform.position.x + (0.01f * moveSpeed), cam.transform.position.y, cam.transform.position.z);
+        }
     }
 }

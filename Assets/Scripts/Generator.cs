@@ -14,7 +14,7 @@ public class Generator : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Backspace))
+        if (Input.GetKeyDown(KeyCode.Return))
         {
             GenerateNewPoints();
         }

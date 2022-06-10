@@ -12,10 +12,6 @@ public class DelaunayTriangulation : MonoBehaviour
     private List<IPoint> points = new List<IPoint>();
     private GameObject meshObject;
 
-    private float radius;
-    private int numSamplesBeforeRejection;
-    private Vector2 regionSize;
-
     [SerializeField] bool drawTrianglePoints = true;
     [SerializeField] bool drawTriangleEdges = true;
     [SerializeField] bool drawVoronoiPoints = true;
@@ -50,14 +46,10 @@ public class DelaunayTriangulation : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Return))
         {
+            Clear();
             points = Generator.points.Select(point => new Vector2(point.x, point.y)).ToPoints().ToList();
             Debug.Log($"Generated Points Count {points.Count}");
             Triangulate();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Backspace))
-        {
-            Clear();
         }
     }
 
