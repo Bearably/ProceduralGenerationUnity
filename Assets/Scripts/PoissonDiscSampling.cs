@@ -7,32 +7,72 @@ public static class PoissonDiscSampling
     public static List<Vector2> GeneratePoints(float radius, Vector2 sampleRegionSize, int numSamplesBeforeRejection = 30)
     {
 
+        float borderSizeX = sampleRegionSize.x / radius;
+        float borderSizeY = sampleRegionSize.y / radius;
+        float borderIncY = borderSizeY / Mathf.FloorToInt(borderSizeY);
+        float borderIncX = borderSizeX / Mathf.FloorToInt(borderSizeX);
         float cellSize = radius / Mathf.Sqrt(2);
         int[,] grid = new int[Mathf.CeilToInt(sampleRegionSize.x / cellSize), Mathf.CeilToInt(sampleRegionSize.y / cellSize)];
         List<Vector2> points = new List<Vector2>();
         List<Vector2> spawnPoints = new List<Vector2>();
+        spawnPoints.Add(sampleRegionSize / 2);
         Vector2 borderPoint1 = new Vector2(0, 0);
         Vector2 borderPoint2 = new Vector2(0, sampleRegionSize.y);
         Vector2 borderPoint3 = new Vector2(sampleRegionSize.x, 0);
         Vector2 borderPoint4 = new Vector2(sampleRegionSize.x, sampleRegionSize.y);
-        for (int borderCount = 0; borderCount < (sampleRegionSize.x * sampleRegionSize.y); borderCount += 10)
+        //Debug.Log(borderSizeX);
+        //Debug.Log(borderSizeY);
+        Vector2 subdivisionBottom = new Vector2(borderPoint1.x + borderIncX / (borderSizeX / sampleRegionSize.x), borderPoint1.y);
+        Vector2 subdivisionBottom2 = new Vector2(borderPoint2.x + borderIncX / (borderSizeX / sampleRegionSize.x), borderPoint2.y);
+        points.Add(subdivisionBottom);
+        spawnPoints.Add(subdivisionBottom);
+        grid[(int)(subdivisionBottom.x / cellSize), (int)(subdivisionBottom.y / cellSize)] = points.Count;
+        points.Add(subdivisionBottom2);
+        spawnPoints.Add(subdivisionBottom);
+        grid[(int)(subdivisionBottom2.x / cellSize), (int)(subdivisionBottom2.y / cellSize)] = points.Count;
+        Vector2 subdivisionTop = new Vector2(0, borderPoint3.y + borderIncY / (borderSizeY / sampleRegionSize.y));
+        Vector2 subdivisionTop2 = new Vector2(borderPoint4.x, borderPoint4.y - borderIncY / (borderSizeY / sampleRegionSize.y));
+        points.Add(subdivisionTop);
+        spawnPoints.Add(subdivisionTop);
+        grid[(int)(subdivisionTop.x / cellSize), (int)(subdivisionTop.y / cellSize)] = points.Count;
+        points.Add(subdivisionTop2);
+        spawnPoints.Add(subdivisionTop2);
+        grid[(int)(subdivisionTop2.x / cellSize), (int)(subdivisionTop2.y / cellSize)] = points.Count;
+
+
+        for (float subdivisionCountX = 0; subdivisionCountX < borderSizeX - borderIncX; subdivisionCountX += borderIncX)
         {
-            int count = 0;
-            Vector2 alongBorderPoint1 = new Vector2(sampleRegionSize.x, sampleRegionSize.y / count);
-            points.Add(alongBorderPoint1);
-            Vector2 alongBorderPoint2 = new Vector2(sampleRegionSize.x / count, sampleRegionSize.y);
-            points.Add(alongBorderPoint2);
-            Vector2 alongBorderPoint3 = new Vector2(0, sampleRegionSize.y / count);
-            points.Add(alongBorderPoint3);
-            Vector2 alongBorderPoint4 = new Vector2(sampleRegionSize.x / count, 0);
-            points.Add(alongBorderPoint4);
-            count++;
+            subdivisionBottom = new Vector2(subdivisionBottom.x + borderIncX / (borderSizeX / sampleRegionSize.x), subdivisionBottom.y);
+            subdivisionBottom2 = new Vector2(subdivisionBottom2.x + borderIncX / (borderSizeX / sampleRegionSize.x), subdivisionBottom2.y);
+            points.Add(subdivisionBottom);
+            spawnPoints.Add(subdivisionBottom);
+            grid[(int)(subdivisionBottom.x / cellSize), (int)(subdivisionBottom.y / cellSize)] = points.Count;
+            points.Add(subdivisionBottom2);
+            spawnPoints.Add(subdivisionBottom2);
+            grid[(int)(subdivisionBottom2.x / cellSize), (int)(subdivisionBottom2.y / cellSize)] = points.Count;
         }
+
+        for (float subdivisionCountY = 0; subdivisionCountY < borderSizeY - borderIncY; subdivisionCountY += borderIncY)
+        {
+            subdivisionTop = new Vector2(0, subdivisionTop.y + borderIncY / (borderSizeY / sampleRegionSize.y));
+            subdivisionTop2 = new Vector2(subdivisionTop2.x, subdivisionTop2.y - borderIncY / (borderSizeY / sampleRegionSize.y));
+            points.Add(subdivisionTop);
+            spawnPoints.Add(subdivisionTop);
+            grid[(int)(subdivisionTop.x / cellSize), (int)(subdivisionTop.y / cellSize)] = points.Count;
+            points.Add(subdivisionTop2);
+            spawnPoints.Add(subdivisionTop2);
+            grid[(int)(subdivisionTop2.x / cellSize), (int)(subdivisionTop2.y / cellSize)] = points.Count;
+        }
+
         points.Add(borderPoint1);
         points.Add(borderPoint2);
         points.Add(borderPoint3);
         points.Add(borderPoint4);
-        spawnPoints.Add(sampleRegionSize / 2);
+        spawnPoints.Add(borderPoint1);
+        spawnPoints.Add(borderPoint2);
+        spawnPoints.Add(borderPoint3);
+        spawnPoints.Add(borderPoint4);
+
         while (spawnPoints.Count > 0)
         {
             int spawnIndex = Random.Range(0, spawnPoints.Count);
@@ -79,7 +119,7 @@ public static class PoissonDiscSampling
                     if (pointIndex != -1)
                     {
                         float squareDistance = (candidate - points[pointIndex]).sqrMagnitude;
-                        if (squareDistance < radius*radius)
+                        if (squareDistance < radius * radius)
                         {
                             return false;
                         }
