@@ -28,6 +28,8 @@ public class Generator : MonoBehaviour
     void checkRadius()
     {
         if (radius < 0.1) radius = Mathf.Max(radius, 0.1f);
+        if (radius > regionSize.x) radius = Mathf.Min(radius, regionSize.x);
+        if (radius > regionSize.y) radius = Mathf.Min(radius, regionSize.y);
     }
 
     void OnValidate()

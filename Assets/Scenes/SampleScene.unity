@@ -153,8 +153,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a419217660d9bb4c93ed3f1a0d19b80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 0.27
-  regionSize: {x: 9, y: 5}
+  radius: 0.6
+  regionSize: {x: 10, y: 10}
   rejectionSamples: 30
   displayRadius: 0.03
 --- !u!4 &13444651
