@@ -6,31 +6,24 @@ public static class PoissonDiscSampling
 {
     public static List<Vector2> GeneratePoints(float radius, Vector2 sampleRegionSize, int numSamplesBeforeRejection = 30)
     {
-        float borderSizeX = sampleRegionSize.x / radius;
-        float borderSizeY = sampleRegionSize.y / radius;
-        float borderIncY = borderSizeY / Mathf.FloorToInt(borderSizeY);
-        float borderIncX = borderSizeX / Mathf.FloorToInt(borderSizeX);
+        //Defines the cell radius using Pythagoras' Theorem.
         float cellSize = radius / Mathf.Sqrt(2);
+        //Generates a 2D grid array to store the positions of vertices.
         int[,] grid = new int[Mathf.CeilToInt(sampleRegionSize.x / cellSize), Mathf.CeilToInt(sampleRegionSize.y / cellSize)];
+        //Creates a list of Vector2 coordinates for the points and the spawnpoints.
         List<Vector2> points = new List<Vector2>();
         List<Vector2> spawnPoints = new List<Vector2>();
-        Debug.Log("Point count: " + points.Count);
-        Debug.Log("Radius: " + radius);
-        Debug.Log("cellSize: " + cellSize);
-        Debug.Log("Spawn Point Count: " + spawnPoints.Count);
-        Debug.Log("X Border Size: " + borderSizeX);
-        Debug.Log("Y Border Size: " + borderSizeY);
-        Debug.Log("X Border Increment: " + borderIncX);
-        Debug.Log("Y Border Increment: " + borderIncY);
-        Debug.Log("Grid array size: " + grid.Length);
-        Debug.Log("Sample Region Size: " + sampleRegionSize);
+        //Adds vertex spawn points.
         spawnPoints.Add(sampleRegionSize / 2);
-
+        
+        //Adds a loop that runs until there are no more spawnpoints left.
         while (spawnPoints.Count > 0)
         {
+            //Generates a random vertex position to test if a vertex can be spawned there
             int spawnIndex = Random.Range(0, spawnPoints.Count);
             Vector2 spawnCentre = spawnPoints[spawnIndex];
             bool candidateAccepted = false;
+            //Runs a loop that samples as many times as specified, and if no results are found then it removes the spawnpoint.
             for (int i = 0; i < numSamplesBeforeRejection; i++)
             {
                 float angle = Random.value * Mathf.PI * 2;
@@ -38,6 +31,7 @@ public static class PoissonDiscSampling
                 Vector2 candidate = spawnCentre + direction * Random.Range(radius, 2 * radius);
                 if (isValid(candidate, sampleRegionSize, cellSize, radius, points, grid))
                 {
+                    //If the vertex position is a valid position, it adds that vertex.
                     addVertex(candidate, cellSize, points, spawnPoints, grid);
                     candidateAccepted = true;
                     break;
@@ -45,9 +39,11 @@ public static class PoissonDiscSampling
             }
             if (!candidateAccepted)
             {
+                //If the candidate wasn't accepted, the spawn point doesn't work, so it is removed.
                 spawnPoints.RemoveAt(spawnIndex);
             }
         }
+        //Returns the array of Vector2 coordinates of vertices.
         return points;
     }
 
@@ -83,7 +79,8 @@ public static class PoissonDiscSampling
     }
 
     static void addVertex(Vector2 vertex, float cellSize, List<Vector2> points, List<Vector2> spawnPoints, int[,] grid)
-    { 
+    {
+        //Adds the vertex to the points array, adds the vertex as a spawnpoint and adds an index for the vertex with its position.
         points.Add(vertex);
         spawnPoints.Add(vertex);
         grid[(int)(vertex.x / cellSize), (int)(vertex.y / cellSize)] = points.Count;

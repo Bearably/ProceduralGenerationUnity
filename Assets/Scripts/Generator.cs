@@ -5,15 +5,15 @@ using UnityEngine;
 
 public class Generator : MonoBehaviour
 {
-    [SerializeField] public float radius = 0.8f;
-    [SerializeField] public Vector2 regionSize = new Vector2(8, 10);
-    [SerializeField] public int rejectionSamples = 30;
-    [SerializeField] public float displayRadius = 0.03f;
+    public float radius = 0.5f;
+    public Vector2 regionSize = new Vector2(10, 10);
+    public int rejectionSamples = 100;
 
     public static List<Vector2> points;
 
     private void Update()
     {
+        //If enter key is pressed, new points are generated.
         if (Input.GetKeyDown(KeyCode.Return))
         {
             GenerateNewPoints();
@@ -22,31 +22,34 @@ public class Generator : MonoBehaviour
 
     private void GenerateNewPoints()
     {
+        //Uses the generate points script in the PoissonDiscSampling script with the specified radius, regionSize and rejection samples.
         points = PoissonDiscSampling.GeneratePoints(radius, regionSize, rejectionSamples);
     }
 
-    void checkRadius()
+    void checkValues()
     {
-        if (radius < 0.1) radius = Mathf.Max(radius, 0.1f);
+        //Clamps the values to reduce errors.
+        if (radius < 0.1) radius = 0.1f;
         if (radius > regionSize.x) radius = Mathf.Min(radius, regionSize.x);
         if (radius > regionSize.y) radius = Mathf.Min(radius, regionSize.y);
+        if (regionSize.x < 0.5)
+        {
+            radius = 0.1f;
+            regionSize.x = 0.5f;
+        }
+        if (regionSize.y < 0.5)
+        {
+            radius = 0.1f;
+            regionSize.y = 0.5f;
+        }
+        if (rejectionSamples < 1) rejectionSamples = 1;
+
+
     }
 
     void OnValidate()
     {
-        checkRadius();
-        GenerateNewPoints();
-    }
-
-    void OnDrawGizmos()
-    {
-        Gizmos.DrawWireCube(regionSize / 2, regionSize);
-        if (points != null)
-        {
-            foreach (Vector2 point in points)
-            {
-                Gizmos.DrawSphere(point, displayRadius);
-            }
-        }
+        //Constantly checks the values to make sure they are not below the threshold.
+        checkValues();
     }
 }
