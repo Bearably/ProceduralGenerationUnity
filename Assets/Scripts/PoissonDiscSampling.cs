@@ -4,6 +4,13 @@ using UnityEngine;
 
 public static class PoissonDiscSampling
 {
+    /// <summary>
+    /// Generates new vertices using Poisson Disc Sampling.
+    /// </summary>
+    /// <param name="radius">The minimum distance between each vertex</param>
+    /// <param name="sampleRegionSize">The region vertices can be sampled within</param>
+    /// <param name="numSamplesBeforeRejection">The amount of times a vertex position is sampled</param>
+    /// <returns>Returns a list of Vector2 positions of sampled vertices.</returns>
     public static List<Vector2> GeneratePoints(float radius, Vector2 sampleRegionSize, int numSamplesBeforeRejection = 30)
     {
         //Defines the cell radius using Pythagoras' Theorem.
@@ -46,7 +53,16 @@ public static class PoissonDiscSampling
         //Returns the array of Vector2 coordinates of vertices.
         return points;
     }
-
+    /// <summary>
+    /// Checks if a vertex position meets a specific criteria.
+    /// </summary>
+    /// <param name="candidate">The vertex position being checked</param>
+    /// <param name="sampleRegionSize">The region size the vertices are sampled within</param>
+    /// <param name="cellSize">The cell radius defined through Pythagoras' Theorem</param>
+    /// <param name="radius">The minimum distance between each vertex</param>
+    /// <param name="points">The list of Vector2 positions for sampled vertices</param>
+    /// <param name="grid">A 2D grid array storing the positions of vertices</param>
+    /// <returns>Returns a boolean value stating if a vertex is an acceptable candidate.</returns>
     static bool isValid(Vector2 candidate, Vector2 sampleRegionSize, float cellSize, float radius, List<Vector2> points, int[,] grid)
     {
         if (candidate.x >= 0 && candidate.x < sampleRegionSize.x && candidate.y >= 0 && candidate.y < sampleRegionSize.y)
@@ -77,7 +93,14 @@ public static class PoissonDiscSampling
         }
         return false;
     }
-
+    /// <summary>
+    /// Adds a vertex to the list of Vector2 positions of sampled vertices, list of spawn points and adds an index for a vertex along with its position.
+    /// </summary>
+    /// <param name="vertex">A vertex position desired to be added</param>
+    /// <param name="cellSize">The cell radius defined through Pythagoras' Theorem</param>
+    /// <param name="points">The list of Vector2 positions of sampled vertices</param>
+    /// <param name="spawnPoints">The list of spawn points used by vertices so no other vertex will spawn there</param>
+    /// <param name="grid">2D grid array storing the positions of vertices</param>
     static void addVertex(Vector2 vertex, float cellSize, List<Vector2> points, List<Vector2> spawnPoints, int[,] grid)
     {
         //Adds the vertex to the points array, adds the vertex as a spawnpoint and adds an index for the vertex with its position.

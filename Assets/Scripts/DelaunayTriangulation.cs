@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEditor;
 using DelaunatorSharp;
@@ -13,7 +14,8 @@ public class DelaunayTriangulation : MonoBehaviour
     private List<IPoint> points = new List<IPoint>();
     private Vector3[] UVPoints;
     private GameObject meshObject;
-    public int resolution = 1024;
+    private float scale;
+    public int resolution = 2048;
     private Texture2D texture;
     [SerializeField] bool drawTrianglePoints = true;
     [SerializeField] bool drawTriangleEdges = true;
@@ -24,6 +26,7 @@ public class DelaunayTriangulation : MonoBehaviour
     private Transform TrianglesContainer;
     [SerializeField] Color triangleEdgeColor = Color.black;
     private Transform PointsContainer;
+    private float freq = Generator.staticFreq;
 
     private void Start()
     {
@@ -36,6 +39,7 @@ public class DelaunayTriangulation : MonoBehaviour
 		//Checks if the enter key has been pressed
         if (Input.GetKeyDown(KeyCode.Return))
         {
+            scale = Generator.staticRadius;
 			//Calls the Clear function to make sure the scene is clear
             Clear();
             //Generates new points using the generator script and adds them to the Vector2 array "points"
@@ -51,7 +55,9 @@ public class DelaunayTriangulation : MonoBehaviour
             Triangulate();
         }
     }
-
+    /// <summary>
+    /// Clears the scene, generates new points and edges and initiates a new Delaunator instance.
+    /// </summary>
     private void Clear()
     {
         //Generates new points and edges.
@@ -66,7 +72,9 @@ public class DelaunayTriangulation : MonoBehaviour
         //Initiates a new delaunator instance.
         delaunator = null;
     }
-
+    /// <summary>
+    /// Creates a new point container.
+    /// </summary>
     private void CreateNewPoints()
     {
         if (PointsContainer != null)
@@ -77,7 +85,9 @@ public class DelaunayTriangulation : MonoBehaviour
         //Initiates a new vertex container.
         PointsContainer = new GameObject(nameof(PointsContainer)).transform;
     }
-
+    /// <summary>
+    /// Creates a new triangles container to store the drawn edges.
+    /// </summary>
     private void CreateNewTrianglesContainer()
     {
         if (TrianglesContainer != null)
@@ -88,7 +98,9 @@ public class DelaunayTriangulation : MonoBehaviour
         //Initiates a new edge container.
         TrianglesContainer = new GameObject(nameof(TrianglesContainer)).transform;
     }
-
+    /// <summary>
+    /// Creates a triangulated mesh from the generated points.
+    /// </summary>
     private void Triangulate()
     {
         //Since a triangle can't have less than 3 vertices, it will not triangulate a mesh if it has less than 3 vertices.
@@ -98,7 +110,9 @@ public class DelaunayTriangulation : MonoBehaviour
         CreateMesh();
         CreateTriangle();
     }
-
+    /// <summary>
+    /// Creates the triangles in the mesh to be drawn.
+    /// </summary>
     private void CreateTriangle()
     {
         // It will not draw edges if there a Delaunator instace was not initialised.
@@ -113,7 +127,15 @@ public class DelaunayTriangulation : MonoBehaviour
             }
         });
     }
-
+    /// <summary>
+    /// Draws each edge in a mesh from a container of triangles.
+    /// </summary>
+    /// <param name="container">The Transform containing the triangles</param>
+    /// <param name="name">Name for the edges</param>
+    /// <param name="points">The array of vertices</param>
+    /// <param name="color">The colour for the edges</param>
+    /// <param name="width">The width of each edge's line</param>
+    /// <param name="order">The sorting order for Unity's line renderer</param>
     private void CreateLine(Transform container, string name, Vector3[] points, Color color, float width, int order = 1)
     {
         //Initialiases a new game object to store the drawn line in. Adds a line renderer so it draws the line, and adds it to the edge container.
@@ -131,7 +153,9 @@ public class DelaunayTriangulation : MonoBehaviour
         lineRenderer.endWidth = width;
         lineRenderer.sortingOrder = order;
     }
-
+    /// <summary>
+    /// Creates a mesh with generated Delaunator points
+    /// </summary>
     private void CreateMesh()
     {
         //Checks if a mesh can be made
@@ -159,23 +183,44 @@ public class DelaunayTriangulation : MonoBehaviour
         var meshRenderer = meshObject.AddComponent<MeshRenderer>();
         var meshFilter = meshObject.AddComponent<MeshFilter>();
         meshFilter.mesh = mesh;
+        Debug.Log(scale);
+        //Calculates mesh UVs to apply the perlin noise map with a scale of 500 (smaller values mean a larger UV map).
+        mesh.uv = UvCalculator.CalculateUVs(UVPoints, 500*(scale*10));
 
-        UvCalculator.CalculateUVs(UVPoints, 1);
-
+        //Creates a noise texture and applies it to the mesh material
         texture = new Texture2D(resolution, resolution, TextureFormat.RGB24, true);
         texture.name = "Procedural Texture";
-        meshObject.GetComponent<MeshRenderer>().material.mainTexture = texture;
         FillTexture();
+        texture.SetPixels32(texture.GetPixels32());
+        texture.Apply(false);
+        File.WriteAllBytes(Application.dataPath + "/../text.png", texture.EncodeToPNG());
+        meshRenderer.material.SetTexture("_MainTex", texture);
     }
+    /// <summary>
+    /// Creates a Perlin noise map and applies it to the mesh.
+    /// </summary>
     private void FillTexture()
     {
+        if (texture.width != resolution)
+        {
+            texture.Reinitialize(resolution, resolution);
+        }
+
+        Vector3 point00 = transform.TransformPoint(new Vector3(-0.5f, -0.5f));
+        Vector3 point10 = transform.TransformPoint(new Vector3(0.5f, -0.5f));
+        Vector3 point01 = transform.TransformPoint(new Vector3(-0.5f, 0.5f));
+        Vector3 point11 = transform.TransformPoint(new Vector3(0.5f, 0.5f));
+
         float stepSize = 1f / resolution;
-        //Fills each pixel with a red colour.
+        //Fills each pixel with the perlin noise map.
         for (int y = 0; y < resolution; y++)
         {
+            Vector3 point0 = Vector3.Lerp(point00, point01, (y + 0.5f) * stepSize);
+            Vector3 point1 = Vector3.Lerp(point10, point11, (y + 0.5f) * stepSize);
             for (int x = 0; x < resolution; x++)
             {
-                texture.SetPixel(x, y, new Color(x * stepSize, y * stepSize, 0f));
+                Vector3 point = Vector3.Lerp(point0, point1, (x + 0.5f) * stepSize);
+                texture.SetPixel(x, y, Color.white * Noise.Value2D(point, freq));
             }
         }
         //Applies the texture.

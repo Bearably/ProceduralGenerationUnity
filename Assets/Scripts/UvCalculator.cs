@@ -16,6 +16,17 @@ public class UvCalculator
             int i1 = i + 1;
             int i2 = i + 2;
 
+            //Special handling if vertex count isn't a multiple of 3
+            if (i == uvs.Length - 1)
+            {
+                i1 = 0;
+                i2 = 1;
+            }
+            if (i == uvs.Length - 2)
+            {
+                i2 = 0;
+            }
+
             Vector3 v0 = v[i0];
             Vector3 v1 = v[i1];
             Vector3 v2 = v[i2];
@@ -37,9 +48,9 @@ public class UvCalculator
                     uvs[i2] = ScaledUV(v2.x, v2.z, scale);
                     break;
                 case Facing.Right:
-                    uvs[i0] = ScaledUV(v0.y, v0.z, scale);
-                    uvs[i1] = ScaledUV(v1.y, v1.z, scale);
-                    uvs[i2] = ScaledUV(v2.y, v2.z, scale);
+                    uvs[i0] = ScaledUV(v0.z, v0.y, scale);
+                    uvs[i1] = ScaledUV(v1.z, v1.y, scale);
+                    uvs[i2] = ScaledUV(v2.z, v2.y, scale);
                     break;
             }
         }

@@ -6,26 +6,43 @@ using UnityEngine;
 public class Generator : MonoBehaviour
 {
     public float radius = 0.5f;
+    public static float staticRadius;
     public Vector2 regionSize = new Vector2(10, 10);
     public int rejectionSamples = 100;
+    public float freq = 1f;
+    public static float staticFreq;
 
     public static List<Vector2> points;
 
     private void Update()
     {
+        if (staticRadius != radius)
+        {
+            staticRadius = radius;
+        }
+
+        if (staticFreq != freq)
+        {
+            staticFreq = freq;
+        }
+
         //If enter key is pressed, new points are generated.
         if (Input.GetKeyDown(KeyCode.Return))
         {
             GenerateNewPoints();
         }
     }
-
+    /// <summary>
+    /// Generates new points from the given radius, region size and rejection samples.
+    /// </summary>
     private void GenerateNewPoints()
     {
         //Uses the generate points script in the PoissonDiscSampling script with the specified radius, regionSize and rejection samples.
         points = PoissonDiscSampling.GeneratePoints(radius, regionSize, rejectionSamples);
     }
-
+    /// <summary>
+    /// Clamps the values from the editor to reduce errors.
+    /// </summary>
     void checkValues()
     {
         //Clamps the values to reduce errors.

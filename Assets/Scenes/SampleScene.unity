@@ -182,17 +182,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98235f32e3caa474b9a13e696e4cebd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  resolution: 1024
   drawTrianglePoints: 1
   drawTriangleEdges: 1
-  drawHull: 1
   createMesh: 1
-  voronoiEdgeWidth: 0.01
   triangleEdgeWidth: 0.01
   meshMaterial: {fileID: 2100000, guid: 57cc1e138a82b0040afb7ffd144568b5, type: 2}
   lineMaterial: {fileID: 2100000, guid: 1dc6695b65880b941b9341c3a2de4da8, type: 2}
   triangleEdgeColor: {r: 0, g: 0, b: 0, a: 1}
-  trianglePointPrefab: {fileID: 5961768956659207801, guid: b713f930e7609a7439d911fd1e79ef6a, type: 3}
-  voronoiPointPrefab: {fileID: 5961768956659207801, guid: 7a819736853b1bb4abd2da80236ada00, type: 3}
 --- !u!1 &1998552958
 GameObject:
   m_ObjectHideFlags: 0
