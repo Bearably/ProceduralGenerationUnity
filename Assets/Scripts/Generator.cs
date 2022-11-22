@@ -9,11 +9,6 @@ public class Generator : MonoBehaviour
     public static float staticRadius;
     public Vector2 regionSize = new Vector2(10, 10);
     public int rejectionSamples = 100;
-    public float freq = 1f;
-    public static float staticFreq;
-    [Range(1,3)]
-    public int dimensions = 3;
-    public static int staticDimensions;
 
     public static List<Vector2> points;
 
@@ -22,16 +17,6 @@ public class Generator : MonoBehaviour
         if (staticRadius != radius)
         {
             staticRadius = radius;
-        }
-
-        if (staticFreq != freq)
-        {
-            staticFreq = freq;
-        }
-
-        if (staticDimensions != dimensions)
-        {
-            staticDimensions = dimensions;
         }
 
         //If enter key is pressed, new points are generated.

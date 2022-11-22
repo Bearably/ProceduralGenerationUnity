@@ -25,7 +25,8 @@ public class DelaunayTriangulation : MonoBehaviour
     private Transform TrianglesContainer;
     [SerializeField] Color triangleEdgeColor = Color.black;
     private Transform PointsContainer;
-    private float freq = Generator.staticFreq;
+    public float freq = 50f;
+    public float scale = 20f;
 
     private void Start()
     {
@@ -35,21 +36,23 @@ public class DelaunayTriangulation : MonoBehaviour
 
     private void Update()
     {
-		//Checks if the enter key has been pressed
+        //Checks if the enter key has been pressed
         if (Input.GetKeyDown(KeyCode.Return))
         {
-			//Calls the Clear function to make sure the scene is clear
+            //Calls the Clear function to make sure the scene is clear
             Clear();
             //Generates new points using the generator script and adds them to the Vector2 array "points"
-            UVPoints = new Vector3[Generator.points.Count];
-            for (int x = 0; x < Generator.points.Count; x++)
-            {
-                UVPoints[x] = new Vector3(Generator.points[x].x, Generator.points[x].y, 0);
-            }
             points = Generator.points.Select(point => new Vector2(point.x, point.y)).ToPoints().ToList();
-			//Shows the count of generated points
+            //Shows the count of generated points
             Debug.Log($"Generated Points Count {points.Count}");
-			//Runs the triangulation function.
+            //Initialises a Vector3 array of UV vertices for a UV map.
+            UVPoints = new Vector3[points.Count];
+            //Runs through each vertex position in the points array and adds its position to the UV map.
+            for (int x = 0; x < points.Count; x++)
+            {
+                UVPoints[x] = new Vector3((float)points[x].X, (float)points[x].Y, 0);
+            }
+            //Runs the triangulation function.
             Triangulate();
         }
     }
@@ -183,31 +186,39 @@ public class DelaunayTriangulation : MonoBehaviour
         meshObject.GetComponent<MeshRenderer>().material = meshMaterial;
         meshFilter.mesh = mesh;
         //Calculates mesh UVs to apply the perlin noise map with a scale of 500 (smaller values mean a larger UV map).
-        mesh.uv = UvCalculator.CalculateUVs(UVPoints, 500);
+        mesh.uv = UvCalculator.CalculateUVs(UVPoints, 50);
 
         //Creates a noise texture and applies it to the mesh material
-        texture = new Texture2D(resolution, resolution, TextureFormat.RGB24, true);
-        texture.wrapMode = TextureWrapMode.Clamp;
-        texture.name = "Procedural Texture";
-        meshObject.GetComponent<MeshRenderer>().material.mainTexture = texture;
-        FillTexture();
-        texture.SetPixels32(texture.GetPixels32());
-        //texture.Apply(false);
+        meshObject.GetComponent<Renderer>().material.mainTexture = GenerateNoise();
+        meshObject.GetComponent<MeshRenderer>().material.mainTexture = GenerateNoise();
         File.WriteAllBytes(Application.dataPath + "/../text.png", texture.EncodeToPNG());
     }
-    /// <summary>
-    /// Creates a Perlin noise map and applies it to the mesh.
-    /// </summary>
-    private void FillTexture()
+
+    private Texture2D GenerateNoise()
     {
-        if (texture.width != resolution)
+        texture = new Texture2D(resolution, resolution);
+        texture.name = "Procedural Texture";
+
+        //Generates a Perlin Noise map for the texture
+        for (int x = 0; x < resolution; x++)
         {
-            texture.Reinitialize(resolution, resolution);
+            for (int y = 0; y < resolution; y++)
+            {
+                Color color = CalculateColour(x, y);
+                texture.SetPixel(x, y, color);
+            }
         }
-        //Code the texture generation here
 
-
-        //Applies the texture.
         texture.Apply();
+        return texture;
+    }
+
+    private Color CalculateColour(int x, int y)
+    {
+        float xCoord = (float)x / resolution * scale;
+        float yCoord = (float)y / resolution * scale;
+
+        float sample = Mathf.PerlinNoise(xCoord, yCoord);
+        return new Color(sample, sample, sample);
     }
 }
