@@ -14,7 +14,6 @@ public class DelaunayTriangulation : MonoBehaviour
     private List<IPoint> points = new List<IPoint>();
     private Vector3[] UVPoints;
     private GameObject meshObject;
-    private float scale;
     public int resolution = 2048;
     private Texture2D texture;
     [SerializeField] bool drawTrianglePoints = true;
@@ -39,7 +38,6 @@ public class DelaunayTriangulation : MonoBehaviour
 		//Checks if the enter key has been pressed
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            scale = Generator.staticRadius;
 			//Calls the Clear function to make sure the scene is clear
             Clear();
             //Generates new points using the generator script and adds them to the Vector2 array "points"
@@ -182,19 +180,20 @@ public class DelaunayTriangulation : MonoBehaviour
         meshObject = new GameObject("TriangleMesh");
         var meshRenderer = meshObject.AddComponent<MeshRenderer>();
         var meshFilter = meshObject.AddComponent<MeshFilter>();
+        meshObject.GetComponent<MeshRenderer>().material = meshMaterial;
         meshFilter.mesh = mesh;
-        Debug.Log(scale);
         //Calculates mesh UVs to apply the perlin noise map with a scale of 500 (smaller values mean a larger UV map).
-        mesh.uv = UvCalculator.CalculateUVs(UVPoints, 500*(scale*10));
+        mesh.uv = UvCalculator.CalculateUVs(UVPoints, 500);
 
         //Creates a noise texture and applies it to the mesh material
         texture = new Texture2D(resolution, resolution, TextureFormat.RGB24, true);
+        texture.wrapMode = TextureWrapMode.Clamp;
         texture.name = "Procedural Texture";
+        meshObject.GetComponent<MeshRenderer>().material.mainTexture = texture;
         FillTexture();
         texture.SetPixels32(texture.GetPixels32());
-        texture.Apply(false);
+        //texture.Apply(false);
         File.WriteAllBytes(Application.dataPath + "/../text.png", texture.EncodeToPNG());
-        meshRenderer.material.SetTexture("_MainTex", texture);
     }
     /// <summary>
     /// Creates a Perlin noise map and applies it to the mesh.
@@ -205,24 +204,9 @@ public class DelaunayTriangulation : MonoBehaviour
         {
             texture.Reinitialize(resolution, resolution);
         }
+        //Code the texture generation here
 
-        Vector3 point00 = transform.TransformPoint(new Vector3(-0.5f, -0.5f));
-        Vector3 point10 = transform.TransformPoint(new Vector3(0.5f, -0.5f));
-        Vector3 point01 = transform.TransformPoint(new Vector3(-0.5f, 0.5f));
-        Vector3 point11 = transform.TransformPoint(new Vector3(0.5f, 0.5f));
 
-        float stepSize = 1f / resolution;
-        //Fills each pixel with the perlin noise map.
-        for (int y = 0; y < resolution; y++)
-        {
-            Vector3 point0 = Vector3.Lerp(point00, point01, (y + 0.5f) * stepSize);
-            Vector3 point1 = Vector3.Lerp(point10, point11, (y + 0.5f) * stepSize);
-            for (int x = 0; x < resolution; x++)
-            {
-                Vector3 point = Vector3.Lerp(point0, point1, (x + 0.5f) * stepSize);
-                texture.SetPixel(x, y, Color.white * Noise.Value2D(point, freq));
-            }
-        }
         //Applies the texture.
         texture.Apply();
     }
