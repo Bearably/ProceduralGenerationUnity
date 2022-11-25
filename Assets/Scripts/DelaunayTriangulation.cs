@@ -27,6 +27,10 @@ public class DelaunayTriangulation : MonoBehaviour
     private Transform PointsContainer;
     public float freq = 50f;
     public float scale = 20f;
+    public int octaves = 1;
+    public float persistance;
+    public float lacunarity;
+    private float sample;
 
     private void Start()
     {
@@ -189,12 +193,12 @@ public class DelaunayTriangulation : MonoBehaviour
         mesh.uv = UvCalculator.CalculateUVs(UVPoints, 50);
 
         //Creates a noise texture and applies it to the mesh material
-        meshObject.GetComponent<Renderer>().material.mainTexture = GenerateNoise();
-        meshObject.GetComponent<MeshRenderer>().material.mainTexture = GenerateNoise();
+        meshObject.GetComponent<Renderer>().material.mainTexture = GenerateNoise(freq);
+        meshObject.GetComponent<MeshRenderer>().material.mainTexture = GenerateNoise(freq);
         File.WriteAllBytes(Application.dataPath + "/../text.png", texture.EncodeToPNG());
     }
 
-    private Texture2D GenerateNoise()
+    private Texture2D GenerateNoise(float freq)
     {
         texture = new Texture2D(resolution, resolution);
         texture.name = "Procedural Texture";
@@ -204,7 +208,12 @@ public class DelaunayTriangulation : MonoBehaviour
         {
             for (int y = 0; y < resolution; y++)
             {
-                Color color = CalculateColour(x, y);
+                float amplitude = 1;
+                float noiseHeight = 0;
+                for (int i = 0; i < octaves; i++) {
+                
+                }
+                Color color = CalculateColour(x, y, noiseHeight, amplitude, freq);
                 texture.SetPixel(x, y, color);
             }
         }
@@ -213,12 +222,29 @@ public class DelaunayTriangulation : MonoBehaviour
         return texture;
     }
 
-    private Color CalculateColour(int x, int y)
+    private Color CalculateColour(int x, int y, float noiseHeight, float amplitude, float freq)
     {
-        float xCoord = (float)x / resolution * scale;
-        float yCoord = (float)y / resolution * scale;
+        float maxNoiseHeight = float.MaxValue;
+        float minNoiseHeight = float.MinValue;
+        for (int i = 0; i < octaves; i++)
+        {
+            float xCoord = (float)x / resolution / scale * freq;
+            float yCoord = (float)y / resolution / scale * freq;
 
-        float sample = Mathf.PerlinNoise(xCoord, yCoord);
+            sample = Mathf.PerlinNoise(xCoord, yCoord) * 2 - 1;
+            noiseHeight += sample * amplitude;
+            amplitude *= persistance;
+            freq *= lacunarity;
+        }
+
+        if (noiseHeight > maxNoiseHeight)
+        {
+            maxNoiseHeight = noiseHeight;
+        }
+        else if (noiseHeight < minNoiseHeight)
+        {
+            minNoiseHeight = noiseHeight;
+        }
         return new Color(sample, sample, sample);
     }
 }

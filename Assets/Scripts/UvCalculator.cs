@@ -9,6 +9,8 @@ public class UvCalculator
     public static Vector2[] CalculateUVs(Vector3[] v/*vertices*/, float scale)
     {
         var uvs = new Vector2[v.Length];
+        float xTranslation = Random.Range(0f, 0.8f);
+        float yTranslation = Random.Range(0f, 0.8f);
 
         for (int i = 0; i < uvs.Length; i += 3)
         {
@@ -53,6 +55,9 @@ public class UvCalculator
                     uvs[i2] = ScaledUV(v2.z, v2.y, scale);
                     break;
             }
+            uvs[i0] = TranslateUV(uvs, i, xTranslation, yTranslation);
+            uvs[i1] = TranslateUV(uvs, i1, xTranslation, yTranslation);
+            uvs[i2] = TranslateUV(uvs, i2, xTranslation, yTranslation);
         }
         return uvs;
     }
@@ -89,5 +94,10 @@ public class UvCalculator
     private static Vector2 ScaledUV(float uv1, float uv2, float scale)
     {
         return new Vector2(uv1 / scale, uv2 / scale);
+    }
+
+    private static Vector2 TranslateUV(Vector2[] UVs, int i, float xTranslation, float yTranslation)
+    {
+        return new Vector2(UVs[i].x + xTranslation, UVs[i].y + yTranslation);
     }
 }
