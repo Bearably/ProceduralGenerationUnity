@@ -25,12 +25,14 @@ public class DelaunayTriangulation : MonoBehaviour
     private Transform TrianglesContainer;
     [SerializeField] Color triangleEdgeColor = Color.black;
     private Transform PointsContainer;
-    public float freq = 50f;
     public float scale = 20f;
     public int octaves = 1;
+    public Vector2 offset;
+    [Range(0,1)]
     public float persistance;
     public float lacunarity;
     private float sample;
+    
 
     private void Start()
     {
@@ -191,60 +193,90 @@ public class DelaunayTriangulation : MonoBehaviour
         meshFilter.mesh = mesh;
         //Calculates mesh UVs to apply the perlin noise map with a scale of 500 (smaller values mean a larger UV map).
         mesh.uv = UvCalculator.CalculateUVs(UVPoints, 50);
-
-        //Creates a noise texture and applies it to the mesh material
-        meshObject.GetComponent<Renderer>().material.mainTexture = GenerateNoise(freq);
-        meshObject.GetComponent<MeshRenderer>().material.mainTexture = GenerateNoise(freq);
-        File.WriteAllBytes(Application.dataPath + "/../text.png", texture.EncodeToPNG());
+        Texture2D NoiseTexture = new Texture2D(resolution, resolution);
+        MapNoise(NoiseTexture, Noise.GenerateNoiseMap(resolution, scale, octaves, persistance, lacunarity, offset));
     }
 
-    private Texture2D GenerateNoise(float freq)
+    private void MapNoise(Texture2D texture, float[,] noiseMap)
     {
-        texture = new Texture2D(resolution, resolution);
-        texture.name = "Procedural Texture";
-
-        //Generates a Perlin Noise map for the texture
-        for (int x = 0; x < resolution; x++)
+        Color[] colourMap = new Color[resolution * resolution];
+        for (int y = 0; y < resolution; y++)
         {
-            for (int y = 0; y < resolution; y++)
+            for (int x = 0; x < resolution; x++)
             {
-                float amplitude = 1;
-                float noiseHeight = 0;
-                for (int i = 0; i < octaves; i++) {
-                
-                }
-                Color color = CalculateColour(x, y, noiseHeight, amplitude, freq);
-                texture.SetPixel(x, y, color);
+                colourMap[y * resolution + x] = Color.Lerp(Color.black, Color.white, noiseMap[x, y]);
             }
         }
-
+        texture.SetPixels(colourMap);
         texture.Apply();
-        return texture;
+
+        meshObject.GetComponent<Renderer>().material.mainTexture = texture;
     }
 
-    private Color CalculateColour(int x, int y, float noiseHeight, float amplitude, float freq)
+    private void CheckValues()
     {
-        float maxNoiseHeight = float.MaxValue;
-        float minNoiseHeight = float.MinValue;
-        for (int i = 0; i < octaves; i++)
+        if (resolution < 1)
         {
-            float xCoord = (float)x / resolution / scale * freq;
-            float yCoord = (float)y / resolution / scale * freq;
-
-            sample = Mathf.PerlinNoise(xCoord, yCoord) * 2 - 1;
-            noiseHeight += sample * amplitude;
-            amplitude *= persistance;
-            freq *= lacunarity;
+            resolution = 1;
         }
 
-        if (noiseHeight > maxNoiseHeight)
+        if (lacunarity < 1)
         {
-            maxNoiseHeight = noiseHeight;
+            lacunarity = 1;
         }
-        else if (noiseHeight < minNoiseHeight)
+
+        if (octaves < 0)
         {
-            minNoiseHeight = noiseHeight;
+            octaves = 0;
         }
-        return new Color(sample, sample, sample);
     }
 }
+
+    //private Texture2D GenerateNoise(float freq)
+    //{
+    //    texture = new Texture2D(resolution, resolution);
+    //    texture.name = "Procedural Texture";
+
+    //    //Generates a Perlin Noise map for the texture
+    //    for (int x = 0; x < resolution; x++)
+    //    {
+    //        for (int y = 0; y < resolution; y++)
+    //        {
+    //            float amplitude = 1;
+    //            float noiseHeight = 0;
+    //            Color color = CalculateColour(x, y, noiseHeight, amplitude, freq);
+    //            texture.SetPixel(x, y, color);
+    //        }
+    //    }
+
+    //    texture.Apply();
+    //    return texture;
+    //}
+
+//    private Color CalculateColour(int x, int y, float noiseHeight, float amplitude, float freq)
+//    {
+//        float maxNoiseHeight = float.MaxValue;
+//        float minNoiseHeight = float.MinValue;
+//        for (int i = 0; i < octaves; i++)
+//        {
+//            float xCoord = (float)x / resolution / scale * freq;
+//            float yCoord = (float)y / resolution / scale * freq;
+
+//            sample = Mathf.PerlinNoise(xCoord, yCoord) * 2 - 1;
+//            noiseHeight += sample * amplitude;
+//            amplitude *= persistance;
+//            freq *= lacunarity;
+//        }
+
+//        if (noiseHeight > maxNoiseHeight)
+//        {
+//            maxNoiseHeight = noiseHeight;
+//        }
+//        else if (noiseHeight < minNoiseHeight)
+//        {
+//            minNoiseHeight = noiseHeight;
+//        }
+
+//        return new Color(sample, sample, sample);
+//    }
+//}
