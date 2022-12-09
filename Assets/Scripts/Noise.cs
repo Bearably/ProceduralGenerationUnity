@@ -59,11 +59,31 @@ public static class Noise
             for (int x = 0; x < resolution; x++)
             {
                 noiseMap[x, y] = Mathf.InverseLerp(minNoiseHeight, maxNoiseHeight, noiseMap[x, y]);
+                //vertices[y].z = noiseMap[x, y];
             }
         }
-                return noiseMap;
+        //mesh.vertices = vertices;
+        return noiseMap;
     }
 
+    public static Mesh Displace(Mesh meshObject, float[,] noiseMap, Texture2D noiseTexture)
+    {
+        int posX;
+        int posY;
+
+        foreach (Vector2 uvVertex in meshObject.uv)
+        {
+            posX = Mathf.CeilToInt(uvVertex.x);
+            posY = Mathf.CeilToInt(uvVertex.y);
+
+            for (int i = 0; i < meshObject.vertices.Length; i++)
+            {
+                meshObject.vertices[i] = new Vector3(meshObject.vertices[i].x, meshObject.vertices[i].y, noiseTexture.GetPixel(posX, posY).grayscale);
+            }
+        }
+
+        return meshObject;
+    }
 }
 
 

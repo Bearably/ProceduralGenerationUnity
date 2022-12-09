@@ -14,6 +14,7 @@ public class DelaunayTriangulation : MonoBehaviour
     private List<IPoint> points = new List<IPoint>();
     private Vector3[] UVPoints;
     private GameObject meshObject;
+    private float[,] noiseMap;
     public int resolution = 2048;
     private Texture2D texture;
     [SerializeField] bool drawTrianglePoints = true;
@@ -194,7 +195,11 @@ public class DelaunayTriangulation : MonoBehaviour
         //Calculates mesh UVs to apply the perlin noise map with a scale of 500 (smaller values mean a larger UV map).
         mesh.uv = UvCalculator.CalculateUVs(UVPoints, 50);
         Texture2D NoiseTexture = new Texture2D(resolution, resolution);
-        MapNoise(NoiseTexture, Noise.GenerateNoiseMap(resolution, scale, octaves, persistance, lacunarity, offset));
+        noiseMap = Noise.GenerateNoiseMap(resolution, scale, octaves, persistance, lacunarity, offset);
+        MapNoise(NoiseTexture, noiseMap);
+        mesh = Noise.Displace(mesh, noiseMap, NoiseTexture);
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
     }
 
     private void MapNoise(Texture2D texture, float[,] noiseMap)
