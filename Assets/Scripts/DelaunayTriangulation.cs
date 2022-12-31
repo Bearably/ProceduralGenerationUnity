@@ -13,6 +13,7 @@ public class DelaunayTriangulation : MonoBehaviour
     private Delaunator delaunator;
     private List<IPoint> points = new List<IPoint>();
     private Vector3[] UVPoints;
+    private Vector2[] UVs;
     private GameObject meshObject;
     private float[,] noiseMap;
     public int resolution = 2048;
@@ -26,6 +27,7 @@ public class DelaunayTriangulation : MonoBehaviour
     private Transform TrianglesContainer;
     [SerializeField] Color triangleEdgeColor = Color.black;
     private Transform PointsContainer;
+    public float heightMultiplier;
     public float scale = 20f;
     public int octaves = 1;
     public Vector2 offset;
@@ -33,6 +35,7 @@ public class DelaunayTriangulation : MonoBehaviour
     public float persistance;
     public float lacunarity;
     private float sample;
+    public TerrainType[] regions;
     
 
     private void Start()
@@ -183,6 +186,7 @@ public class DelaunayTriangulation : MonoBehaviour
         };
 
         //Recalculates the normals and bounds of the mesh (to ensure lighting is correct)
+        //mesh.Optimize();
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
 
@@ -193,28 +197,38 @@ public class DelaunayTriangulation : MonoBehaviour
         meshObject.GetComponent<MeshRenderer>().material = meshMaterial;
         meshFilter.mesh = mesh;
         //Calculates mesh UVs to apply the perlin noise map with a scale of 500 (smaller values mean a larger UV map).
-        mesh.uv = UvCalculator.CalculateUVs(UVPoints, 50);
-        Texture2D NoiseTexture = new Texture2D(resolution, resolution);
-        noiseMap = Noise.GenerateNoiseMap(resolution, scale, octaves, persistance, lacunarity, offset);
-        MapNoise(NoiseTexture, noiseMap);
-        mesh = Noise.Displace(mesh, noiseMap, NoiseTexture);
-        mesh.RecalculateNormals();
-        mesh.RecalculateBounds();
+        UVs = UvCalculator.CalculateUVs(UVPoints, 50);
+        mesh.uv = UVs;
+        Color[] colourMap = GenerateNoiseMap();
+        Texture2D NoiseTexture = TextureGenerator.TextureFromColourMap(colourMap, resolution);
+        MapNoise(NoiseTexture);
+        Displace(mesh, noiseMap, NoiseTexture);
     }
 
-    private void MapNoise(Texture2D texture, float[,] noiseMap)
+    private Color[] GenerateNoiseMap()
     {
+        noiseMap = Noise.GenerateNoiseMap(resolution, scale, octaves, persistance, lacunarity, offset);
         Color[] colourMap = new Color[resolution * resolution];
         for (int y = 0; y < resolution; y++)
         {
             for (int x = 0; x < resolution; x++)
             {
-                colourMap[y * resolution + x] = Color.Lerp(Color.black, Color.white, noiseMap[x, y]);
+                float currentHeight = noiseMap[x, y];
+                for (int i = 0; i < regions.Length; i++)
+                {
+                    if (currentHeight <= regions[i].height)
+                    {
+                        colourMap[y * resolution + x] = regions[i].colour;
+                        break;
+                    }
+                }
             }
         }
-        texture.SetPixels(colourMap);
-        texture.Apply();
+        return colourMap;
+    }
 
+    private void MapNoise(Texture2D texture)
+    {
         meshObject.GetComponent<Renderer>().material.mainTexture = texture;
     }
 
@@ -234,6 +248,36 @@ public class DelaunayTriangulation : MonoBehaviour
         {
             octaves = 0;
         }
+    }
+
+    [System.Serializable]
+    public struct TerrainType
+    {
+        public string name;
+        public float height;
+        public Color colour;
+    }
+
+    private void Displace(Mesh meshObject, float[,] noiseMap, Texture2D noiseTexture)
+    {
+        int posX;
+        int posY;
+        Vector3[] newVerts = new Vector3[meshObject.vertexCount];
+        Debug.Log(meshObject.uv.Length);
+        Debug.Log(meshObject.vertices.Length);
+
+        for (int i = 0; i < meshObject.vertexCount; i++)
+        {
+            posX = Mathf.CeilToInt(meshObject.uv[i].x * noiseTexture.width);
+            posY = Mathf.CeilToInt(meshObject.uv[i].y * noiseTexture.height);
+            newVerts[i] = new Vector3(meshObject.vertices[i].x, meshObject.vertices[i].y, noiseTexture.GetPixel(posX, posY).grayscale * heightMultiplier);
+        }
+
+        meshObject.vertices = newVerts;
+        meshObject.uv = UVs;
+        //meshObject.Optimize();
+        meshObject.RecalculateNormals();
+        meshObject.RecalculateBounds();
     }
 }
 

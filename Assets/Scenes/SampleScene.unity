@@ -153,9 +153,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a419217660d9bb4c93ed3f1a0d19b80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 0.6
+  radius: 0.3
   regionSize: {x: 10, y: 10}
-  rejectionSamples: 99
+  rejectionSamples: 30
 --- !u!4 &13444651
 Transform:
   m_ObjectHideFlags: 0
@@ -183,7 +183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98235f32e3caa474b9a13e696e4cebd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resolution: 1024
+  resolution: 2048
   drawTrianglePoints: 1
   drawTriangleEdges: 1
   createMesh: 1
@@ -191,8 +191,37 @@ MonoBehaviour:
   meshMaterial: {fileID: 2100000, guid: 57cc1e138a82b0040afb7ffd144568b5, type: 2}
   lineMaterial: {fileID: 2100000, guid: 1dc6695b65880b941b9341c3a2de4da8, type: 2}
   triangleEdgeColor: {r: 0, g: 0, b: 0, a: 1}
-  freq: 50
-  scale: 20
+  heightMultiplier: 0
+  scale: 60
+  octaves: 8
+  offset: {x: 0, y: 0}
+  persistance: 0.491
+  lacunarity: 0.5
+  regions:
+  - name: Deep Water
+    height: 0.1
+    colour: {r: 0.09638661, g: 0.14024366, b: 0.3584906, a: 0}
+  - name: Shallow Water
+    height: 0.35
+    colour: {r: 0.20024922, g: 0.390472, b: 0.5660378, a: 0}
+  - name: Sand
+    height: 0.45
+    colour: {r: 0.754717, g: 0.64116573, b: 0.252759, a: 0}
+  - name: Grass Edge
+    height: 0.5
+    colour: {r: 0.094339624, g: 0.3773585, b: 0.106100254, a: 0}
+  - name: Grass
+    height: 0.6
+    colour: {r: 0.08566214, g: 0.5188679, b: 0.11797991, a: 0}
+  - name: Low Rock
+    height: 0.7
+    colour: {r: 0.3490566, g: 0.33775437, b: 0.3210662, a: 0}
+  - name: High Rock
+    height: 0.8
+    colour: {r: 0.14150941, g: 0.13520414, b: 0.12749197, a: 0}
+  - name: Snow
+    height: 1
+    colour: {r: 1, g: 1, b: 1, a: 0}
 --- !u!1 &1998552958
 GameObject:
   m_ObjectHideFlags: 0
