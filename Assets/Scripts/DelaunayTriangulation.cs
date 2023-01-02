@@ -27,7 +27,9 @@ public class DelaunayTriangulation : MonoBehaviour
     private Transform TrianglesContainer;
     [SerializeField] Color triangleEdgeColor = Color.black;
     private Transform PointsContainer;
+    public Vector2 cutoffRegionSize = new Vector2(8, 8);
     public float heightMultiplier;
+    public AnimationCurve meshHeightCurve;
     public float scale = 20f;
     public int octaves = 1;
     public Vector2 offset;
@@ -119,7 +121,7 @@ public class DelaunayTriangulation : MonoBehaviour
         //Initiates a new delaunator instance.
         delaunator = new Delaunator(points.ToArray());
         CreateMesh();
-        CreateTriangle();
+        //CreateTriangle();
     }
     /// <summary>
     /// Creates the triangles in the mesh to be drawn.
@@ -262,20 +264,20 @@ public class DelaunayTriangulation : MonoBehaviour
     {
         int posX;
         int posY;
+        var uvs = meshObject.uv;
+        var vertices = meshObject.vertices;
         Vector3[] newVerts = new Vector3[meshObject.vertexCount];
-        Debug.Log(meshObject.uv.Length);
-        Debug.Log(meshObject.vertices.Length);
 
         for (int i = 0; i < meshObject.vertexCount; i++)
         {
-            posX = Mathf.CeilToInt(meshObject.uv[i].x * noiseTexture.width);
-            posY = Mathf.CeilToInt(meshObject.uv[i].y * noiseTexture.height);
-            newVerts[i] = new Vector3(meshObject.vertices[i].x, meshObject.vertices[i].y, noiseTexture.GetPixel(posX, posY).grayscale * heightMultiplier);
+            posX = Mathf.CeilToInt(uvs[i].x * noiseTexture.width);
+            posY = Mathf.CeilToInt(uvs[i].y * noiseTexture.height);
+            float currentHeight = noiseMap[posX, posY];
+            newVerts[i] = new Vector3(vertices[i].x, vertices[i].y, meshHeightCurve.Evaluate(currentHeight) * -heightMultiplier);
         }
 
         meshObject.vertices = newVerts;
         meshObject.uv = UVs;
-        //meshObject.Optimize();
         meshObject.RecalculateNormals();
         meshObject.RecalculateBounds();
     }

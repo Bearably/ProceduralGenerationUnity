@@ -39,17 +39,17 @@ public class Generator : MonoBehaviour
     void checkValues()
     {
         //Clamps the values to reduce errors.
-        if (radius < 0.1) radius = 0.1f;
+        if (radius < 0.05f) radius = 0.05f;
         if (radius > regionSize.x) radius = Mathf.Min(radius, regionSize.x);
         if (radius > regionSize.y) radius = Mathf.Min(radius, regionSize.y);
         if (regionSize.x < 0.5)
         {
-            radius = 0.1f;
+            radius = 0.05f;
             regionSize.x = 0.5f;
         }
         if (regionSize.y < 0.5)
         {
-            radius = 0.1f;
+            radius = 0.05f;
             regionSize.y = 0.5f;
         }
         if (rejectionSamples < 1) rejectionSamples = 1;

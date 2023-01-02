@@ -13,7 +13,7 @@ public static class TextureGenerator
     public static Texture2D TextureFromColourMap(Color[] colourMap, int resolution)
     {
         Texture2D texture = new Texture2D(resolution, resolution);
-        texture.filterMode = FilterMode.Point;
+        texture.filterMode = FilterMode.Trilinear;
         texture.SetPixels(colourMap);
         texture.Apply();
         return texture;
