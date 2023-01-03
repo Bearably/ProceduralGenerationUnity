@@ -8,6 +8,7 @@ public class Generator : MonoBehaviour
     public float radius = 0.5f;
     public static float staticRadius;
     public Vector2 regionSize = new Vector2(10, 10);
+    public static Vector2 staticRegionSize = new Vector2(10, 10);
     public int rejectionSamples = 100;
 
     public static List<Vector2> points;
@@ -17,6 +18,11 @@ public class Generator : MonoBehaviour
         if (staticRadius != radius)
         {
             staticRadius = radius;
+        }
+
+        if (staticRegionSize != regionSize)
+        {
+            staticRegionSize = regionSize;
         }
 
         //If enter key is pressed, new points are generated.
