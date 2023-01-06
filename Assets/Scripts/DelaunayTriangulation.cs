@@ -28,7 +28,7 @@ public class DelaunayTriangulation : MonoBehaviour
     [SerializeField] Color triangleEdgeColor = Color.black;
     private Transform PointsContainer;
     private Vector2 regionSize = Generator.staticRegionSize;
-    public Vector2 cutoffRegionSize = new Vector2(8, 8);
+    public float cutoffRegionSize = 5;
     public float heightMultiplier;
     public AnimationCurve meshHeightCurve;
     public float scale = 20f;
@@ -199,7 +199,7 @@ public class DelaunayTriangulation : MonoBehaviour
         var meshFilter = meshObject.AddComponent<MeshFilter>();
         meshObject.GetComponent<MeshRenderer>().material = meshMaterial;
         meshFilter.mesh = mesh;
-        MeshCleanup.Cleanup(mesh, regionSize, cutoffRegionSize);
+        //MeshCleanup.Cleanup(mesh, regionSize, cutoffRegionSize);
         CreateUVPoints(mesh);
         //Calculates mesh UVs to apply the perlin noise map with a scale of 500 (smaller values mean a larger UV map).
         UVs = UvCalculator.CalculateUVs(UVPoints, 50);
