@@ -8,25 +8,38 @@ public static class MeshCleanup
     {
         int[] triangles = mesh.triangles;
         Vector3[] vertices = mesh.vertices;
+        Debug.Log(triangles.Length);
+        Debug.Log(vertices.Length);
         Vector2 r1 = new Vector2(regionSize.x - cutoffRegion.x, regionSize.y - cutoffRegion.y);
         Vector2 r2 = new Vector2(regionSize.x, regionSize.y - cutoffRegion.y);
         Vector2 r3 = new Vector2(regionSize.x - cutoffRegion.x, regionSize.y);
         Vector2 r4 = new Vector2(cutoffRegion.x, cutoffRegion.y);
-        for (int i = 0; i < triangles.Length; i = i + 3)
+        List<int> triangleIDContainer = new List<int>();
+        for (int i = 0; i < triangles.Length; i += 3)
         {
             // Check if the triangle and rectangle intersect
-            if (IsTriangleRectangleIntersecting(vertices[i], vertices[i + 1], vertices[i + 2], r1, r2, r3, r4))
+            if (IsTriangleRectangleIntersecting(vertices[triangles[i]], vertices[triangles[i + 1]], vertices[triangles[i + 2]], r1, r2, r3, r4))
             {
                 //Triangle and rectangle are intersecting
-                Debug.Log(triangles[i/3] + "is Intersecting");
+                //Debug.Log(triangles[i] + "is Intersecting");
+                triangleIDContainer.Add(triangles[i]);
             }
             else
             {
-                Debug.Log(triangles[i/3] + " is Not Intersecting");
+                //Debug.Log(triangles[i] + " is Not Intersecting");
                 //Triangle and rectangle are not intersecting
             }
         }
+        
+        triangleIDContainer.Sort();
 
+        for (int i = 0; i < triangleIDContainer.Count; i++)
+        {
+            Debug.Log(triangleIDContainer[i]);
+            triangles = DeleteTriangle(triangleIDContainer[i] - i, triangles);
+        }
+
+        mesh.triangles = triangles;
     }
 
     static bool IsTriangleRectangleIntersecting(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 r1, Vector2 r2, Vector2 r3, Vector2 r4)
@@ -132,6 +145,30 @@ public static class MeshCleanup
             return true;
         }
         return false;
+    }
+
+    static int[] DeleteTriangle(int id, int[] triangles)
+    {
+        int[] oldTriangles = triangles;
+        int[] newTriangles = new int[triangles.Length - 3];
+
+        int i = 0;
+        int j = 0;
+
+        while (j < oldTriangles.Length)
+        {
+            if (j != id)
+            {
+                newTriangles[i++] = oldTriangles[j++];
+            }
+            else
+            {
+                j++;
+            }
+        }
+
+        triangles = newTriangles;
+        return triangles;
     }
 
 }

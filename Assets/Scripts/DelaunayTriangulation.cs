@@ -59,12 +59,12 @@ public class DelaunayTriangulation : MonoBehaviour
             //Shows the count of generated points
             Debug.Log($"Generated Points Count {points.Count}");
             //Initialises a Vector3 array of UV vertices for a UV map.
-            UVPoints = new Vector3[points.Count];
-            //Runs through each vertex position in the points array and adds its position to the UV map.
-            for (int x = 0; x < points.Count; x++)
-            {
-                UVPoints[x] = new Vector3((float)points[x].X, (float)points[x].Y, 0);
-            }
+            //UVPoints = new Vector3[points.Count];
+            ////Runs through each vertex position in the points array and adds its position to the UV map.
+            //for (int x = 0; x < points.Count; x++)
+            //{
+            //    UVPoints[x] = new Vector3((float)points[x].X, (float)points[x].Y, 0);
+            //}
             //Runs the triangulation function.
             Triangulate();
         }
@@ -200,6 +200,7 @@ public class DelaunayTriangulation : MonoBehaviour
         meshObject.GetComponent<MeshRenderer>().material = meshMaterial;
         meshFilter.mesh = mesh;
         MeshCleanup.Cleanup(mesh, regionSize, cutoffRegionSize);
+        CreateUVPoints(mesh);
         //Calculates mesh UVs to apply the perlin noise map with a scale of 500 (smaller values mean a larger UV map).
         UVs = UvCalculator.CalculateUVs(UVPoints, 50);
         mesh.uv = UVs;
@@ -207,6 +208,15 @@ public class DelaunayTriangulation : MonoBehaviour
         Texture2D NoiseTexture = TextureGenerator.TextureFromColourMap(colourMap, resolution);
         MapNoise(NoiseTexture);
         Displace(mesh, noiseMap, NoiseTexture);
+    }
+
+    private void CreateUVPoints(Mesh mesh)
+    {
+        UVPoints = new Vector3[mesh.vertexCount];
+        for (int i = 0; i < mesh.vertexCount; i++)
+        {
+            UVPoints[i] = new Vector3((float)mesh.vertices[i].x, (float)mesh.vertices[i].y, 0);
+        }
     }
 
     private Color[] GenerateNoiseMap()
