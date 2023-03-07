@@ -1,0 +1,10 @@
+# 
+# Wavefront material file
+# Created with Kaydara FBX
+# 
+
+newmtl Default_Material__Instance_
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 1.000000
+illum 1
+Tr 1.000000

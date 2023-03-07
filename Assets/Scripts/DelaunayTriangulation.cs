@@ -17,27 +17,15 @@ public class DelaunayTriangulation : MonoBehaviour
     private GameObject meshObject;
     private float[,] noiseMap;
     public int resolution = 2048;
-    private Texture2D texture;
-    [SerializeField] bool drawTrianglePoints = true;
-    [SerializeField] bool drawTriangleEdges = true;
-    [SerializeField] bool createMesh = true;
-    [SerializeField] float triangleEdgeWidth = 0.015f;
-    [SerializeField] Material meshMaterial;
-    [SerializeField] Material lineMaterial;
     private Transform TrianglesContainer;
-    [SerializeField] Color triangleEdgeColor = Color.black;
+    private Material meshMaterial;
     private Transform PointsContainer;
-    private Vector2 regionSize = Generator.staticRegionSize;
-    public float cutoffRegionSize = 5;
     public float heightMultiplier;
     public AnimationCurve meshHeightCurve;
     public float scale = 20f;
     public int octaves = 1;
-    public Vector2 offset;
-    [Range(0,1)]
     public float persistance;
     public float lacunarity;
-    private float sample;
     public TerrainType[] regions;
     
 
@@ -127,20 +115,20 @@ public class DelaunayTriangulation : MonoBehaviour
     /// <summary>
     /// Creates the triangles in the mesh to be drawn.
     /// </summary>
-    private void CreateTriangle()
-    {
-        // It will not draw edges if there a Delaunator instace was not initialised.
-        if (delaunator == null) return;
+    //private void CreateTriangle()
+    //{
+    //    // It will not draw edges if there a Delaunator instace was not initialised.
+    //    if (delaunator == null) return;
 
-        delaunator.ForEachTriangleEdge(edge =>
-        {
-            if (drawTriangleEdges)
-            {
-                //Draws a line for each triangle edge within the mesh with a specified colour and width.
-                CreateLine(TrianglesContainer, $"TriangleEdge {edge.Index}", new Vector3[] { edge.P.ToVector3(), edge.Q.ToVector3() }, triangleEdgeColor, triangleEdgeWidth, 0);
-            }
-        });
-    }
+    //    delaunator.ForEachTriangleEdge(edge =>
+    //    {
+    //        //if (drawTriangleEdges)
+    //        //{
+    //        //    //Draws a line for each triangle edge within the mesh with a specified colour and width.
+    //        //    CreateLine(TrianglesContainer, $"TriangleEdge {edge.Index}", new Vector3[] { edge.P.ToVector3(), edge.Q.ToVector3() }, triangleEdgeColor, triangleEdgeWidth, 0);
+    //        //}
+    //    });
+    //}
     /// <summary>
     /// Draws each edge in a mesh from a container of triangles.
     /// </summary>
@@ -150,30 +138,28 @@ public class DelaunayTriangulation : MonoBehaviour
     /// <param name="color">The colour for the edges</param>
     /// <param name="width">The width of each edge's line</param>
     /// <param name="order">The sorting order for Unity's line renderer</param>
-    private void CreateLine(Transform container, string name, Vector3[] points, Color color, float width, int order = 1)
-    {
-        //Initialiases a new game object to store the drawn line in. Adds a line renderer so it draws the line, and adds it to the edge container.
-        var lineGameObject = new GameObject(name);
-        lineGameObject.transform.parent = container;
-        var lineRenderer = lineGameObject.AddComponent<LineRenderer>();
+    //private void CreateLine(Transform container, string name, Vector3[] points, Color color, float width, int order = 1)
+    //{
+    //    //Initialiases a new game object to store the drawn line in. Adds a line renderer so it draws the line, and adds it to the edge container.
+    //    var lineGameObject = new GameObject(name);
+    //    lineGameObject.transform.parent = container;
+    //    var lineRenderer = lineGameObject.AddComponent<LineRenderer>();
 
-        lineRenderer.SetPositions(points);
+    //    lineRenderer.SetPositions(points);
 
-        //Sets the material and colours for the edges.
-        lineRenderer.material = lineMaterial ?? new Material(Shader.Find("Standard"));
-        lineRenderer.startColor = color;
-        lineRenderer.endColor = color;
-        lineRenderer.startWidth = width;
-        lineRenderer.endWidth = width;
-        lineRenderer.sortingOrder = order;
-    }
+    //    //Sets the material and colours for the edges.
+    //    lineRenderer.material = lineMaterial ?? new Material(Shader.Find("Standard"));
+    //    lineRenderer.startColor = color;
+    //    lineRenderer.endColor = color;
+    //    lineRenderer.startWidth = width;
+    //    lineRenderer.endWidth = width;
+    //    lineRenderer.sortingOrder = order;
+    //}
     /// <summary>
     /// Creates a mesh with generated Delaunator points
     /// </summary>
     private void CreateMesh()
     {
-        //Checks if a mesh can be made
-        if (!createMesh) return;
 
         //Destroys the mesh object if it is not empty.
         if (meshObject != null)
@@ -221,7 +207,7 @@ public class DelaunayTriangulation : MonoBehaviour
 
     private Color[] GenerateNoiseMap()
     {
-        noiseMap = Noise.GenerateNoiseMap(resolution, scale, octaves, persistance, lacunarity, offset);
+        noiseMap = Noise.GenerateNoiseMap(resolution, scale, octaves, persistance, lacunarity);
         Color[] colourMap = new Color[resolution * resolution];
         for (int y = 0; y < resolution; y++)
         {

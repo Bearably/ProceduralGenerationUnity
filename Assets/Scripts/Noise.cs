@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 public static class Noise
 {
-    public static float[,] GenerateNoiseMap(int resolution, float scale, int octaves, float persistance, float lacunarity, Vector2 offset)
+    public static float[,] GenerateNoiseMap(int resolution, float scale, int octaves, float persistance, float lacunarity)
     {
         float[,] noiseMap = new float[resolution, resolution];
 
-        Vector2[] octaveOffsets = new Vector2[octaves];
-        for (int i = 0; i < octaves; i++)
-        {
-            float offsetX = offset.x;
-            float offsetY = offset.y;
-            octaveOffsets[i] = new Vector2(offsetX, offsetY);
-        }
+        //Vector2[] octaveOffsets = new Vector2[octaves];
+        //for (int i = 0; i < octaves; i++)
+        //{
+        //    float offsetX = offset.x;
+        //    float offsetY = offset.y;
+        //    octaveOffsets[i] = new Vector2(offsetX, offsetY);
+        //}
 
         if (scale <= 0)
         {
@@ -33,8 +33,8 @@ public static class Noise
 
                 for (int i = 0; i < octaves; i++)
                 {
-                    float sampleX = x / scale * frequency + octaveOffsets[i].x;
-                    float sampleY = y / scale * frequency + octaveOffsets[i].y;
+                    float sampleX = x / scale * frequency;
+                    float sampleY = y / scale * frequency;
 
                     float perlinValue = Mathf.PerlinNoise(sampleX, sampleY) * 2 - 1;
                     noiseHeight += perlinValue * amplitude;
